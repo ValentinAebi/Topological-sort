@@ -1,0 +1,10 @@
+
+turn-engines-on ==> taxiing ==> acceleration
+board-passengers ==> close-door
+close-door ==> turn-engines-on
+pre-flight-checklist ==> taxiing
+clean-cabine ==> board-passengers
+safety-instructions ==> taxiing
+ATC-clearance ==> acceleration
+acceleration ==> reach-v1 ==> reach-v2 ==> takeoff
+board-passengers ==> safety-instructions
