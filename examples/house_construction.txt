@@ -1,0 +1,10 @@
+
+receive-permit ==> find-company ==> lay-foundations
+lay-foundations ==> build-walls
+produce-cement ==> transport-cement ==> lay-foundations
+build-walls ==> build-roof
+ask-for-permit ==> bureaucracy ==> receive-permit
+find-company ==> pay-company ==> lay-foundations
+buy-furnitures ==> install-furnitures
+build-roof ==> install-furnitures
+install-furnitures ==> move-in
