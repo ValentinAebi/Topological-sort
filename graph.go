@@ -15,6 +15,15 @@ type Graph struct {
 	AdjLists map[Vertex][]Vertex
 }
 
+func (graph *Graph) getVertices() []Vertex {
+	var nbVertices = len(graph.AdjLists)
+	var vertices = make([]Vertex, 0, nbVertices)
+	for u := range graph.AdjLists {
+		vertices = append(vertices, u)
+	}
+	return vertices
+}
+
 func NewGraph(edges []Edge) Graph {
 	var adjLists = make(map[Vertex][]Vertex)
 	for _, e := range edges {
@@ -41,18 +50,71 @@ func TopologicalSort(graph Graph) []Vertex {
 	explore = func(vertices []Vertex) {
 		for _, u := range vertices {
 			if !discoveredVertices[u] {
+				discoveredVertices[u] = true
 				explore(graph.AdjLists[u])
 				time += 1
 				sorted[nbVertices-time] = u
-				discoveredVertices[u] = true
 			}
 		}
 	}
 
-	var vertices = make([]Vertex, 0, nbVertices)
-	for u := range graph.AdjLists {
-		vertices = append(vertices, u)
-	}
-	explore(vertices)
+	explore(graph.getVertices())
 	return sorted
+}
+
+func FindCycle(graph Graph) []Vertex {
+
+	var nbVertices = len(graph.AdjLists)
+	var currentPathVertices = make(map[Vertex]int, nbVertices)
+	var depth = 0
+
+	// Return:
+	//
+	// - stack: the stack at the time of cycle detection: Vertex -> depth
+	//
+	// - firstRepeated: the vertex in the stack at which the cycle begins
+	var explore func([]Vertex) (stack map[Vertex]int, firstRepeated Vertex)
+	explore = func(vertices []Vertex) (stack map[Vertex]int, firstRepeated Vertex) {
+		for _, u := range vertices {
+			if _, pr := currentPathVertices[u]; pr {
+				stack = currentPathVertices
+				firstRepeated = u
+				return
+			} else {
+				currentPathVertices[u] = depth
+				depth += 1
+				stack, firstRepeated = explore(graph.AdjLists[u])
+				depth -= 1
+				if stack != nil {
+					return
+				}
+				delete(currentPathVertices, u)
+			}
+		}
+		return nil, ""
+	}
+
+	var stack, firstRepeated = explore(graph.getVertices())
+
+	if stack == nil {
+		return nil
+	} else {
+		// build reverse map: depth -> vertex
+		var reversedStackMap = make(map[int]Vertex)
+		var depthOfFirstRepeated int
+		for vertex, depth := range stack {
+			reversedStackMap[depth] = vertex
+			if vertex == firstRepeated {
+				depthOfFirstRepeated = depth
+			}
+		}
+		var cycleLen = len(reversedStackMap) - depthOfFirstRepeated + 1
+		var cycleSlice = make([]Vertex, cycleLen)
+		for i := 0; i < cycleLen-1; i++ {
+			cycleSlice[i] = reversedStackMap[i+depthOfFirstRepeated]
+		}
+		cycleSlice[cycleLen-1] = firstRepeated
+		return cycleSlice
+	}
+
 }

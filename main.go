@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 )
-
-// TODO check cycles
 
 func main() {
 
@@ -40,15 +39,13 @@ func main() {
 	}
 
 	var graph = NewGraph(edges)
+	var cycle = FindCycle(graph)
+	if cycle != nil {
+		log.Fatalf("cannot find an ordering: cycle found\nCYCLE IS   %s\n", strings.Join(cycle, " => "))
+	}
+
 	var sorted = TopologicalSort(graph)
 	fmt.Println("Resulting ordering:")
-	var length = len(sorted)
-	for i, elem := range sorted {
-		fmt.Print(elem)
-		if i < length-1 {
-			fmt.Print(" => ")
-		}
-	}
-	fmt.Println()
+	fmt.Println(strings.Join(sorted, " => "))
 
 }
